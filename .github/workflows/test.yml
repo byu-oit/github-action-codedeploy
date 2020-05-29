@@ -1,22 +1,22 @@
-# I really don't know the best way to test this, so commenting it all out for now.
-# A test would require setting up an application (probably with terraform).
-# Just use https://github.com/byu-oit/hello-world-api and https://github.com/byu-oit/hw-lambda-api to test for now.
+ name: "Test"
+ on:
+   push:
+     branches:
+       - master
 
-# name: "Test"
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   test:
-#     name: Test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v1
+ jobs:
+   test:
+     name: Test
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v1
 #       - name: CodeDeploy
 #         uses: ./
 #         with:
 #           application-name: some-cd-app
 #           deployment-group-name: some-cd-group
 #           appspec-file: some-appspec-file
+
+# I really don't know the best way to test this, so commenting it all out for now.
+# A test would require setting up an application (probably with terraform).
+# Just use https://github.com/byu-oit/hello-world-api and https://github.com/byu-oit/hw-lambda-api to test for now.
