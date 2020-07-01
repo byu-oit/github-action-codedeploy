@@ -26,7 +26,7 @@
          run: npm build
 
        - name: npm run pack
-         run: npm run pack
+         run: npm run package
 
    audit:
      name: Audit
@@ -57,24 +57,26 @@
          run: npm install
 
        - name: npm lint
-         run: npm lint
+         run: npm run lint
 
-   test:
-     name: Test
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v2
+# No node tests setup yet
 
-       - name: Set up Node.js
-         uses: actions/setup-node@v1
-         with:
-           node-version: ${{ env.node_version }}
-
-       - name: npm install
-         run: npm install
-
-       - name: npm test
-         run: npm test
+#   test:
+#     name: Test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ env.node_version }}
+#
+#       - name: npm install
+#         run: npm install
+#
+#       - name: npm test
+#         run: npm test
 
 #   test:
 #     name: Test
