@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as fs from 'fs'
 import client from 'aws-sdk/clients/codedeploy'
 
-async function run () {
+async function run(): Promise<void> {
   try {
     const appName = core.getInput('application-name')
     const groupName = core.getInput('deployment-group-name')
@@ -16,26 +16,33 @@ async function run () {
     core.debug('*** end appspecJson ***')
 
     const codeDeploy = new client()
-    const deployment = await codeDeploy.createDeployment({
-      applicationName: appName,
-      deploymentGroupName: groupName,
-      revision: {
-        revisionType: 'AppSpecContent',
-        appSpecContent: {
-          content: appspecJson
+    const deployment = await codeDeploy
+      .createDeployment({
+        applicationName: appName,
+        deploymentGroupName: groupName,
+        revision: {
+          revisionType: 'AppSpecContent',
+          appSpecContent: {
+            content: appspecJson
+          }
         }
-      }
-    }).promise()
+      })
+      .promise()
     core.debug(`deployment: ${JSON.stringify(deployment)}`)
-    await codeDeploy.waitFor('deploymentSuccessful', {
-      deploymentId: deployment.deploymentId!
-    }).promise()
+    if (deployment.deploymentId == null) {
+      core.setFailed('deploymentId should not be null')
+      return
+    }
+    await codeDeploy
+      .waitFor('deploymentSuccessful', {
+        deploymentId: deployment.deploymentId
+      })
+      .promise()
 
     process.exit(0)
   } catch (error) {
-    console.error(error)
+    core.error(error)
     core.setFailed(error.message)
-    process.exit(1)
   }
 }
 
