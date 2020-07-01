@@ -19,14 +19,14 @@
          with:
            node-version: ${{ env.node_version }}
 
-       - name: npm install
-         run: npm install
+       - name: yarn install
+         run: yarn install
 
-       - name: npm build
-         run: npm build
+       - name: yarn build
+         run: yarn build
 
-       - name: npm run pack
-         run: npm run package
+       - name: yarn run pack
+         run: yarn run pack
 
    audit:
      name: Audit
@@ -39,8 +39,8 @@
          with:
            node-version: ${{ env.node_version }}
 
-       - name: npm audit
-         run: npm audit --audit-level=critical
+       - name: yarn audit
+         run: yarn audit --level critical [[ $? -ge 16 ]] && exit 1 || exit 0 # this last part is needed because yarn audit returns a non-0 code if any vulnerabilities are found
 
    lint:
      name: Lint
@@ -53,30 +53,28 @@
          with:
            node-version: ${{ env.node_version }}
 
-       - name: npm install
-         run: npm install
+       - name: yarn install
+         run: yarn install
 
-       - name: npm lint
-         run: npm run lint
+       - name: yarn lint
+         run: yarn run lint
 
-# No node tests setup yet
+   test:
+     name: Test
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v2
 
-#   test:
-#     name: Test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v1
-#         with:
-#           node-version: ${{ env.node_version }}
-#
-#       - name: npm install
-#         run: npm install
-#
-#       - name: npm test
-#         run: npm test
+       - name: Set up Node.js
+         uses: actions/setup-node@v1
+         with:
+           node-version: ${{ env.node_version }}
+
+       - name: yarn install
+         run: yarn install
+
+       - name: yarn test
+         run: yarn test
 
 #   test:
 #     name: Test
