@@ -1,3 +1,4 @@
+![CI](https://github.com/byu-oit/github-action-codedeploy/workflows/CI/badge.svg)
 ![Test](https://github.com/byu-oit/github-action-codedeploy/workflows/Test/badge.svg)
 
 # ![BYU logo](https://www.hscripts.com/freeimages/logos/university-logos/byu/byu-logo-clipart-128.gif) github-action-codedeploy
