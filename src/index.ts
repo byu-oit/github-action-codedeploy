@@ -39,7 +39,7 @@ async function run(): Promise<void> {
 
     const {awsAccountAlias, awsAccountId} = await getAccountInformation()
     const region = codeDeploy.config.region
-    const linkToLogIn = 'https://awslogin.byu.edu/'
+    const linkToLogIn = 'https://aws.byu.edu/'
     const linkToDeployment = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deployment.deploymentId}?region=${region}`
     core.info(`Started deployment.
     
