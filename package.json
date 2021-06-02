@@ -1,6 +1,6 @@
 {
   "name": "github-action-codedeploy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "codedeploy github action",
   "main": "lib/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "Scott Hutchings",
   "license": "Apache-2.0",
   "dependencies": {
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.6",
     "aws-sdk": "^2.677.0"
   },
   "devDependencies": {
