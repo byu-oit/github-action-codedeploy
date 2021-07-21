@@ -59,7 +59,6 @@ To view the progress of this deployment:
 
     process.exit(0)
   } catch (error) {
-    core.error(error)
     core.setFailed(error.message)
   }
 }
