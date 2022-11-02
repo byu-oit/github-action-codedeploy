@@ -6,9 +6,9 @@ import STS from 'aws-sdk/clients/sts'
 
 async function run(): Promise<void> {
   try {
-    const appName = core.getInput('application-name')
-    const groupName = core.getInput('deployment-group-name')
-    const appspecFile = core.getInput('appspec-file')
+    const appName = core.getInput('application-name', {required: true})
+    const groupName = core.getInput('deployment-group-name', {required: true})
+    const appspecFile = core.getInput('appspec-file', {required: true})
     core.debug(`Hello world! ${appName}, ${groupName}, ${appspecFile}`)
 
     const appspecJson = fs.readFileSync(appspecFile, 'utf8')
