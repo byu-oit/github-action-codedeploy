@@ -19,6 +19,7 @@
     "aws-sdk": "^2.1246.0"
   },
   "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
     "@types/jest": "^29.2.1",
     "@types/node": "^16.18.3",
     "@typescript-eslint/parser": "^2.8.0",
