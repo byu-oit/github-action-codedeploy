@@ -6,9 +6,9 @@ import STS from 'aws-sdk/clients/sts'
 
 async function run(): Promise<void> {
   try {
-    const appName = core.getInput('application-name')
-    const groupName = core.getInput('deployment-group-name')
-    const appspecFile = core.getInput('appspec-file')
+    const appName = core.getInput('application-name', {required: true})
+    const groupName = core.getInput('deployment-group-name', {required: true})
+    const appspecFile = core.getInput('appspec-file', {required: true})
     core.debug(`Hello world! ${appName}, ${groupName}, ${appspecFile}`)
 
     const appspecJson = fs.readFileSync(appspecFile, 'utf8')
@@ -59,7 +59,13 @@ To view the progress of this deployment:
 
     process.exit(0)
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else if (typeof error === 'string') {
+      core.setFailed(error)
+    } else {
+      core.setFailed(`An unexpected error occurred: ${error}`)
+    }
   }
 }
 
