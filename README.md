@@ -15,7 +15,7 @@ jobs:
     steps:
     # ... Initial setup of AWS Creds, etc.
     - name: CodeDeploy
-      uses: byu-oit/github-action-codedeploy@v1
+      uses: byu-oit/github-action-codedeploy@v2
       with:
         application-name: some-cd-app
         deployment-group-name: some-cd-group
@@ -49,7 +49,7 @@ jobs:
       run: terraform output codedeploy_appspec_json_file
 
     - name: 'CodeDeploy'
-      uses: byu-oit/github-action-codedeploy@v1
+      uses: byu-oit/github-action-codedeploy@v2
       with:
         application-name: ${{ steps.cd-app-name.outputs.stdout }}
         deployment-group-name: ${{ steps.cd-group-name.outputs.stdout }}
