@@ -48,8 +48,7 @@ Deployment ID:    ${deployment.deploymentId}
 AWS Account:      ${awsAccountAlias} (${awsAccountId})
 Region:           ${region}
 
-To log in and view the progress of this deployment, click here:
-${shortcutLink}`)
+Link to deployment: ${shortcutLink}`)
 
     await codeDeploy
       .waitFor('deploymentSuccessful', {
