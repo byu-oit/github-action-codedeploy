@@ -8,8 +8,8 @@ inputs:
     description: 'CodeDeploy Deployment Group Name'
     required: true
   appspec-file:
-    description: 'Appspec file'
+    description: 'AppSpec file'
     required: true
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

@@ -39,17 +39,17 @@ async function run(): Promise<void> {
 
     const {awsAccountAlias, awsAccountId} = await getAccountInformation()
     const region = codeDeploy.config.region
-    const linkToLogIn = 'https://aws.byu.edu/'
-    const linkToDeployment = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deployment.deploymentId}?region=${region}`
+    const iamRole = `PowerUser-${awsAccountId}`
+    const destinationUrl = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deployment.deploymentId}?region=${region}`
+    const shortcutLink = `https://byulogin.awsapps.com/start/#/console?account_id=${encodeURIComponent(awsAccountId)}&role_name=${encodeURIComponent(iamRole)}&destination=${encodeURIComponent(destinationUrl)}`
     core.info(`Started deployment.
     
 Deployment ID:    ${deployment.deploymentId}
 AWS Account:      ${awsAccountAlias} (${awsAccountId})
 Region:           ${region}
 
-To view the progress of this deployment:
- • Log into the ${awsAccountAlias} AWS account at ${linkToLogIn}
- • Go to ${linkToDeployment}`)
+To log in and view the progress of this deployment, click here:
+${shortcutLink}`)
 
     await codeDeploy
       .waitFor('deploymentSuccessful', {
