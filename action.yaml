@@ -10,6 +10,9 @@ inputs:
   appspec-file:
     description: 'AppSpec file'
     required: true
+  max-wait-time:
+    description: 'Maximum time to wait for CodeDeploy to complete'
+    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'

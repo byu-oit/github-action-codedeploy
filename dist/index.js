@@ -64655,6 +64655,7 @@ async function run() {
         const appName = (0, core_1.getInput)('application-name', { required: true });
         const groupName = (0, core_1.getInput)('deployment-group-name', { required: true });
         const appspecFile = (0, core_1.getInput)('appspec-file', { required: true });
+        const maxWaitTime = parseInt((0, core_1.getInput)('max-wait-time'), 10) || 3600; // Default to one hour
         (0, core_1.debug)(`Hello world! ${appName}, ${groupName}, ${appspecFile}`);
         const appspecJson = (0, fs_1.readFileSync)(appspecFile, 'utf8');
         (0, core_1.debug)('*** appspecJson ***');
@@ -64687,7 +64688,6 @@ AWS Account:      ${awsAccountAlias} (${awsAccountId})
 Region:           ${region}
 
 Link to deployment: ${shortcutLink}`);
-        const maxWaitTime = 3600; // One hour
         await (0, client_codedeploy_1.waitUntilDeploymentSuccessful)({ client: codedeployClient, maxWaitTime }, { deploymentId });
         process.exit(0);
     }

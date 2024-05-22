@@ -9,6 +9,7 @@ async function run(): Promise<void> {
     const appName = getInput('application-name', {required: true})
     const groupName = getInput('deployment-group-name', {required: true})
     const appspecFile = getInput('appspec-file', {required: true})
+    const maxWaitTime = parseInt(getInput('max-wait-time'), 10) || 3600 // Default to one hour
     debug(`Hello world! ${appName}, ${groupName}, ${appspecFile}`)
 
     const appspecJson = readFileSync(appspecFile, 'utf8')
@@ -47,7 +48,6 @@ Region:           ${region}
 
 Link to deployment: ${shortcutLink}`)
 
-    const maxWaitTime = 3600 // One hour
     await waitUntilDeploymentSuccessful({ client: codedeployClient, maxWaitTime }, { deploymentId })
 
     process.exit(0)
