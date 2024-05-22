@@ -1,94 +1,78 @@
-import * as core from '@actions/core'
-import * as fs from 'fs'
-import CodeDeploy from 'aws-sdk/clients/codedeploy'
-import IAM from 'aws-sdk/clients/iam'
-import STS from 'aws-sdk/clients/sts'
+import { getInput, debug, info, setFailed } from '@actions/core'
+import { readFileSync } from 'fs'
+import { CodeDeployClient, CreateDeploymentCommand, waitUntilDeploymentSuccessful } from '@aws-sdk/client-codedeploy'
+import { IAMClient, ListAccountAliasesCommand } from '@aws-sdk/client-iam'
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts'
 
 async function run(): Promise<void> {
   try {
-    const appName = core.getInput('application-name', {required: true})
-    const groupName = core.getInput('deployment-group-name', {required: true})
-    const appspecFile = core.getInput('appspec-file', {required: true})
-    core.debug(`Hello world! ${appName}, ${groupName}, ${appspecFile}`)
+    const appName = getInput('application-name', {required: true})
+    const groupName = getInput('deployment-group-name', {required: true})
+    const appspecFile = getInput('appspec-file', {required: true})
+    debug(`Hello world! ${appName}, ${groupName}, ${appspecFile}`)
 
-    const appspecJson = fs.readFileSync(appspecFile, 'utf8')
+    const appspecJson = readFileSync(appspecFile, 'utf8')
 
-    core.debug('*** appspecJson ***')
-    core.debug(appspecJson)
-    core.debug('*** end appspecJson ***')
+    debug('*** appspecJson ***')
+    debug(appspecJson)
+    debug('*** end appspecJson ***')
 
-    const codeDeploy = new CodeDeploy()
-    const deployment = await codeDeploy
-      .createDeployment({
-        applicationName: appName,
-        deploymentGroupName: groupName,
-        revision: {
-          revisionType: 'AppSpecContent',
-          appSpecContent: {
-            content: appspecJson
-          }
+    const codedeployClient = new CodeDeployClient()
+    const { deploymentId } = await codedeployClient.send(new CreateDeploymentCommand({
+      applicationName: appName,
+      deploymentGroupName: groupName,
+      revision: {
+        revisionType: 'AppSpecContent',
+        appSpecContent: {
+          content: appspecJson
         }
-      })
-      .promise()
-    core.debug(`deployment: ${JSON.stringify(deployment)}`)
+      }
+    }))
 
-    if (deployment.deploymentId == null) {
-      core.setFailed('deploymentId should not be null')
+    if (deploymentId == null) {
+      setFailed('deploymentId should not be null')
       return
     }
 
-    const {awsAccountAlias, awsAccountId} = await getAccountInformation()
-    const region = codeDeploy.config.region
+    const { awsAccountAlias, awsAccountId } = await getAccountInformation()
+    const region = codedeployClient.config.region
     const iamRole = `PowerUser-${awsAccountId}`
-    const destinationUrl = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deployment.deploymentId}?region=${region}`
+    const destinationUrl = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deploymentId}?region=${region}`
     const shortcutLink = `https://byulogin.awsapps.com/start/#/console?account_id=${encodeURIComponent(awsAccountId)}&role_name=${encodeURIComponent(iamRole)}&destination=${encodeURIComponent(destinationUrl)}`
-    core.info(`Started deployment.
+    info(`Started deployment.
     
-Deployment ID:    ${deployment.deploymentId}
+Deployment ID:    ${deploymentId}
 AWS Account:      ${awsAccountAlias} (${awsAccountId})
 Region:           ${region}
 
 Link to deployment: ${shortcutLink}`)
 
-    await codeDeploy
-      .waitFor('deploymentSuccessful', {
-        deploymentId: deployment.deploymentId
-      })
-      .promise()
+    const maxWaitTime = 3600 // One hour
+    await waitUntilDeploymentSuccessful({ client: codedeployClient, maxWaitTime }, { deploymentId })
 
     process.exit(0)
   } catch (error) {
     if (error instanceof Error) {
-      core.setFailed(error.message)
+      setFailed(error.message)
     } else if (typeof error === 'string') {
-      core.setFailed(error)
+      setFailed(error)
     } else {
-      core.setFailed(`An unexpected error occurred: ${error}`)
+      setFailed(`An unexpected error occurred: ${error}`)
     }
   }
 }
 
-run()
-
+const iamClient = new IAMClient()
+const stsClient = new STSClient()
 async function getAccountInformation(): Promise<{awsAccountAlias: string; awsAccountId: string}> {
-  const iam = new IAM()
-  const sts = new STS()
   const [
-    {
-      AccountAliases: [awsAccountAlias = '?']
-    },
-    {Account: awsAccountId = '?'}
+    { AccountAliases: [awsAccountAlias] = ['?'] },
+    { Account: awsAccountId = '?' }
   ] = await Promise.all([
-    iam
-      .listAccountAliases()
-      .promise()
-      .catch(() => {
-        return {AccountAliases: ['?']}
-      }),
-    sts
-      .getCallerIdentity()
-      .promise()
-      .catch(() => ({Account: '?'}))
+    iamClient.send(new ListAccountAliasesCommand()).catch(() => ({ AccountAliases: ['?'] })),
+    stsClient.send(new GetCallerIdentityCommand()).catch(() => ({ Account: '?' }))
   ])
-  return {awsAccountAlias, awsAccountId}
+  return { awsAccountAlias , awsAccountId }
 }
+
+run()
