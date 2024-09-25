@@ -42,7 +42,7 @@ async function run(): Promise<void> {
     }
 
     const {awsAccountAlias, awsAccountId} = await getAccountInformation()
-    const region = codedeployClient.config.region
+    const region = process.env.AWS_REGION
     const iamRole = `PowerUser-${awsAccountId}`
     const destinationUrl = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deploymentId}?region=${region}`
     const shortcutLink = `https://byulogin.awsapps.com/start/#/console?account_id=${encodeURIComponent(
