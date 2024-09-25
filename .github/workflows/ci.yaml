@@ -43,7 +43,7 @@ jobs:
           cache: yarn
 
       - name: yarn audit
-        run: yarn audit --level critical [[ $? -ge 16 ]] && exit 1 || exit 0 # this last part is needed because yarn audit returns a non-0 code if any vulnerabilities are found
+        run: yarn audit --level critical; [[ $? -ge 16 ]] && exit 1 || exit 0 # this last part is needed because yarn audit returns a non-0 code if any vulnerabilities are found
 
   lint:
     name: Lint
