@@ -1,8 +1,12 @@
-import { getInput, debug, info, setFailed } from '@actions/core'
-import { readFileSync } from 'fs'
-import { CodeDeployClient, CreateDeploymentCommand, waitUntilDeploymentSuccessful } from '@aws-sdk/client-codedeploy'
-import { IAMClient, ListAccountAliasesCommand } from '@aws-sdk/client-iam'
-import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts'
+import {getInput, debug, info, setFailed} from '@actions/core'
+import {readFileSync} from 'fs'
+import {
+  CodeDeployClient,
+  CreateDeploymentCommand,
+  waitUntilDeploymentSuccessful
+} from '@aws-sdk/client-codedeploy'
+import {IAMClient, ListAccountAliasesCommand} from '@aws-sdk/client-iam'
+import {STSClient, GetCallerIdentityCommand} from '@aws-sdk/client-sts'
 
 async function run(): Promise<void> {
   try {
@@ -19,27 +23,31 @@ async function run(): Promise<void> {
     debug('*** end appspecJson ***')
 
     const codedeployClient = new CodeDeployClient()
-    const { deploymentId } = await codedeployClient.send(new CreateDeploymentCommand({
-      applicationName: appName,
-      deploymentGroupName: groupName,
-      revision: {
-        revisionType: 'AppSpecContent',
-        appSpecContent: {
-          content: appspecJson
+    const {deploymentId} = await codedeployClient.send(
+      new CreateDeploymentCommand({
+        applicationName: appName,
+        deploymentGroupName: groupName,
+        revision: {
+          revisionType: 'AppSpecContent',
+          appSpecContent: {
+            content: appspecJson
+          }
         }
-      }
-    }))
+      })
+    )
 
     if (deploymentId == null) {
       setFailed('deploymentId should not be null')
       return
     }
 
-    const { awsAccountAlias, awsAccountId } = await getAccountInformation()
+    const {awsAccountAlias, awsAccountId} = await getAccountInformation()
     const region = codedeployClient.config.region
     const iamRole = `PowerUser-${awsAccountId}`
     const destinationUrl = `https://${region}.console.aws.amazon.com/codesuite/codedeploy/deployments/${deploymentId}?region=${region}`
-    const shortcutLink = `https://byulogin.awsapps.com/start/#/console?account_id=${encodeURIComponent(awsAccountId)}&role_name=${encodeURIComponent(iamRole)}&destination=${encodeURIComponent(destinationUrl)}`
+    const shortcutLink = `https://byulogin.awsapps.com/start/#/console?account_id=${encodeURIComponent(
+      awsAccountId
+    )}&role_name=${encodeURIComponent(iamRole)}&destination=${encodeURIComponent(destinationUrl)}`
     info(`Started deployment.
     
 Deployment ID:    ${deploymentId}
@@ -48,7 +56,7 @@ Region:           ${region}
 
 Link to deployment: ${shortcutLink}`)
 
-    await waitUntilDeploymentSuccessful({ client: codedeployClient, maxWaitTime }, { deploymentId })
+    await waitUntilDeploymentSuccessful({client: codedeployClient, maxWaitTime}, {deploymentId})
 
     process.exit(0)
   } catch (error) {
@@ -65,14 +73,12 @@ Link to deployment: ${shortcutLink}`)
 const iamClient = new IAMClient()
 const stsClient = new STSClient()
 async function getAccountInformation(): Promise<{awsAccountAlias: string; awsAccountId: string}> {
-  const [
-    { AccountAliases: [awsAccountAlias] = ['?'] },
-    { Account: awsAccountId = '?' }
-  ] = await Promise.all([
-    iamClient.send(new ListAccountAliasesCommand()).catch(() => ({ AccountAliases: ['?'] })),
-    stsClient.send(new GetCallerIdentityCommand()).catch(() => ({ Account: '?' }))
-  ])
-  return { awsAccountAlias , awsAccountId }
+  const [{AccountAliases: [awsAccountAlias] = ['?']}, {Account: awsAccountId = '?'}] =
+    await Promise.all([
+      iamClient.send(new ListAccountAliasesCommand()).catch(() => ({AccountAliases: ['?']})),
+      stsClient.send(new GetCallerIdentityCommand()).catch(() => ({Account: '?'}))
+    ])
+  return {awsAccountAlias, awsAccountId}
 }
 
 run()
