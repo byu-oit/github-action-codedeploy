@@ -23,7 +23,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/jest": "^29.5.13",
-    "@types/node": "^20.16.8",
+    "@types/node": "^22.10.1",
     "@typescript-eslint/parser": "^8.7.0",
     "@vercel/ncc": "^0.38.2",
     "eslint": "^8.57.1",
